@@ -19,7 +19,7 @@
 :root {
   --motion-short: 250ms;
   --motion-state: 500ms;
-  --motion-greeting: 6500ms;
+  --motion-greeting: 5200ms;
   --motion-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
   --header-height: 5rem;
 }
@@ -612,21 +612,39 @@ figcaption {
   height: 7rem;
   display: grid;
   place-items: center;
-  border: 1px solid #ffdbcd66;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #a7756390, #7f4f3e70);
+  position: relative;
+  isolation: isolate;
+  border: 1px solid #ead0bd55;
+  border-radius: 48% 52% 49% 51% / 52% 48% 53% 47%;
+  background: #b7947b3b;
   box-shadow:
-    0 0 45px #ffb59f26,
-    0 0 80px #ffb59f16;
+    3px 9px 20px -8px #0006,
+    inset 1px 2px 12px #f5dac125;
   color: #ffdbcd;
+}
+.breath-disc::before,
+.breath-disc::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 4px 7px 8px 3px;
+  border-radius: 51% 49% 53% 47%;
+  background: #ecd9bf20;
+  filter: blur(3px);
+  transform: rotate(-12deg);
+}
+.breath-disc::after {
+  inset: 12px 4px 3px 12px;
+  background: #b68e7420;
+  transform: rotate(18deg);
 }
 .breath-disc span {
   font-size: 0.75rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
-.breath-disc.breathing {
-  animation: quiet-breath 8s ease-in-out 2;
+.grounding-visual[data-breathing="true"] .breath-disc {
+  animation: quiet-breath 8s ease-in-out infinite;
 }
 .grounding-companion {
   position: absolute;
@@ -836,8 +854,19 @@ figcaption {
 }
 .companion {
   width: 4rem;
-  height: 3.375rem;
+  aspect-ratio: 68 / 54;
+  height: auto;
   color: #261e1b;
+}
+.hero-companion .companion,
+.final-companion .companion {
+  width: 4.75rem;
+}
+.grounding-companion .companion {
+  width: 4.5rem;
+}
+.reflection-companion .companion {
+  width: 3.75rem;
 }
 .companion svg {
   width: 100%;
@@ -854,9 +883,24 @@ figcaption {
   fill: #4a3e39;
 }
 .companion-pose,
-.companion-body {
+.companion-body,
+.companion-idle,
+.companion-reaction,
+.companion-breath {
   transform-origin: 34px 43px;
-  transition: transform var(--motion-state) var(--motion-ease);
+}
+.companion-pose,
+.companion .limb {
+  transition: transform 750ms var(--motion-ease);
+}
+.companion-eyes {
+  transform-origin: 34px 22px;
+}
+.leg-left {
+  transform-origin: 27px 40px;
+}
+.leg-right {
+  transform-origin: 38px 40px;
 }
 .arm-left {
   transform-origin: 14px 26px;
@@ -865,20 +909,59 @@ figcaption {
   transform-origin: 53px 26px;
 }
 .companion[data-state="overwhelmed"] .companion-pose {
-  transform: translateY(2px) rotate(-2deg);
+  transform: translateY(2.5px) rotate(-1deg);
 }
 .companion[data-state="low"] .companion-pose,
 .companion[data-state="sit"] .companion-pose {
   transform: translateY(3px);
 }
 .companion[data-state="restless"] .companion-pose {
-  transform: rotate(-2deg);
+  transform: rotate(-1deg);
 }
 .companion[data-state="notice"] .companion-pose {
   transform: rotate(3deg);
 }
 .companion[data-state="good"] .companion-pose {
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
+}
+.companion[data-state="grounded"] .companion-pose,
+.companion[data-state="settle"] .companion-pose {
+  transform: translateY(1.5px);
+}
+.companion[data-state="look"] .companion-pose {
+  transform: rotate(4deg);
+}
+.companion[data-state="listen"] .companion-pose {
+  transform: rotate(-2deg);
+}
+.companion[data-state="overwhelmed"] .arm-left {
+  transform: rotate(-12deg);
+}
+.companion[data-state="overwhelmed"] .arm-right {
+  transform: rotate(12deg);
+}
+.companion[data-state="overwhelmed"] .leg-left {
+  transform: translateX(1px);
+}
+.companion[data-state="overwhelmed"] .leg-right {
+  transform: translateX(-1px);
+}
+.companion[data-state="low"] .arm-left,
+.companion[data-state="settle"] .arm-left {
+  transform: rotate(-8deg);
+}
+.companion[data-state="low"] .arm-right,
+.companion[data-state="settle"] .arm-right {
+  transform: rotate(8deg);
+}
+.companion[data-state="good"] .arm-left {
+  transform: rotate(12deg);
+}
+.companion[data-state="good"] .arm-right {
+  transform: rotate(-12deg);
+}
+.companion[data-state="notice"] .leg-right {
+  transform: translate(1px, -1px);
 }
 .companion-dark .torso {
   fill: #776358;
@@ -896,13 +979,65 @@ figcaption {
   animation: companion-wave var(--motion-greeting) var(--motion-ease) both;
 }
 .companion-goodbye .arm-left {
-  animation: companion-wave 5s var(--motion-ease) both;
+  animation: companion-wave var(--motion-greeting) var(--motion-ease) both;
+}
+.companion-goodbye .companion-body {
+  animation: goodbye-notice var(--motion-greeting) var(--motion-ease) both;
 }
 .companion-greeting .leg-left {
   animation: tiny-step var(--motion-greeting) linear both;
 }
 .companion-greeting .leg-right {
   animation: tiny-step var(--motion-greeting) linear 450ms both;
+}
+.companion[data-motion="normal"][data-gesture="rest"] .companion-breath {
+  animation: companion-breathe 8s ease-in-out infinite;
+}
+.companion[data-motion="normal"][data-gesture="rest"] .companion-idle {
+  animation: idle-presence 22s var(--motion-ease) infinite;
+}
+.companion[data-motion="normal"][data-gesture="rest"] .companion-eyes {
+  animation: idle-blink 22s ease-in-out infinite;
+}
+.companion[data-state="low"] .companion-eyes {
+  animation-duration: 36s !important;
+}
+.companion[data-state="low"] .companion-idle,
+.companion[data-state="breathe"] .companion-idle,
+.companion[data-state="grounded"] .companion-idle,
+.companion[data-state="look"] .companion-idle,
+.companion[data-state="listen"] .companion-idle,
+.companion[data-state="settle"] .companion-idle,
+.companion[data-state="listen"] .companion-breath,
+.companion[data-state="settle"] .companion-breath,
+.companion[data-state="listen"] .companion-eyes {
+  animation: none !important;
+}
+.companion[data-motion="normal"][data-state="overwhelmed"] .companion-reaction {
+  animation: companion-release 850ms var(--motion-ease);
+}
+.companion[data-motion="normal"][data-state="restless"] .companion-reaction {
+  animation: companion-reposition 900ms var(--motion-ease);
+}
+.companion[data-motion="normal"][data-state="notice"] .companion-eyes {
+  animation:
+    slow-blink 900ms ease-in-out,
+    idle-blink 22s 900ms ease-in-out infinite;
+}
+.companion[data-motion="normal"][data-state="settle"] .companion-eyes {
+  animation: slow-blink 1200ms ease-in-out;
+}
+.companion[data-visible="false"],
+.companion[data-visible="false"] * {
+  animation-play-state: paused !important;
+}
+.grounding-visual .companion[data-state="breathe"] .companion-breath {
+  animation: none;
+}
+.grounding-visual[data-breathing="true"]
+  .companion[data-state="breathe"]
+  .companion-breath {
+  animation: companion-breathe 8s ease-in-out infinite;
 }
 @keyframes hero-reveal {
   from {
@@ -926,49 +1061,126 @@ figcaption {
 }
 @keyframes companion-arrive {
   0% {
-    transform: translateX(18px);
+    transform: translateX(14px);
   }
-  12% {
-    transform: translate(12px, -1px);
+  10% {
+    transform: translate(8px, -1px);
   }
-  24% {
-    transform: translate(6px, 0);
+  20% {
+    transform: translate(3px, 0);
   }
-  36% {
-    transform: translate(0, -1px);
+  30%,
+  44% {
+    transform: none;
   }
-  44%,
+  52%,
+  88% {
+    transform: rotate(-1.5deg);
+  }
   100% {
     transform: none;
   }
 }
 @keyframes companion-wave {
   0%,
-  55%,
+  48%,
   100% {
     transform: none;
   }
-  68% {
-    transform: rotate(32deg);
-  }
+  60%,
   78% {
-    transform: rotate(18deg);
+    transform: rotate(104deg);
   }
-  88% {
-    transform: rotate(30deg);
+  69%,
+  87% {
+    transform: rotate(68deg);
   }
 }
 @keyframes tiny-step {
   0%,
-  12%,
-  24%,
-  36%,
+  14%,
   100% {
     transform: none;
   }
-  6%,
-  30% {
-    transform: translateY(-1.5px);
+  7% {
+    transform: translate(-3px, -4px) rotate(-8deg);
+  }
+}
+@keyframes goodbye-notice {
+  0%,
+  100% {
+    transform: none;
+  }
+  18%,
+  90% {
+    transform: translateY(-1.5px) rotate(-1deg);
+  }
+}
+@keyframes companion-breathe {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-0.6px) scale(1.012);
+  }
+}
+@keyframes idle-blink {
+  0%,
+  35%,
+  39%,
+  100% {
+    transform: scaleY(1);
+  }
+  37% {
+    transform: scaleY(0.12);
+  }
+}
+@keyframes slow-blink {
+  0%,
+  35%,
+  100% {
+    transform: scaleY(1);
+  }
+  60% {
+    transform: scaleY(0.12);
+  }
+}
+@keyframes idle-presence {
+  0%,
+  52%,
+  59%,
+  75%,
+  83%,
+  100% {
+    transform: none;
+  }
+  55% {
+    transform: translate(0.8px, 0.5px) rotate(-1deg);
+  }
+  79% {
+    transform: rotate(1.5deg);
+  }
+}
+@keyframes companion-release {
+  0%,
+  100% {
+    transform: none;
+  }
+  35% {
+    transform: translateY(-0.5px) scale(1.015);
+  }
+}
+@keyframes companion-reposition {
+  0%,
+  100% {
+    transform: none;
+  }
+  35% {
+    transform: translateX(1.5px) rotate(1.5deg);
+  }
+  70% {
+    transform: translateX(-0.5px);
   }
 }
 @keyframes quiet-breath {
@@ -977,7 +1189,145 @@ figcaption {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.08);
+    transform: scale(1.045);
+  }
+}
+/* Selective enhancement. No hidden content until the observer is installed. */
+[data-reveal-state="pending"]:is(
+  [data-reveal="heading"],
+  [data-reveal="copy"],
+  [data-reveal="eyebrow"],
+  [data-reveal="marker"]
+) {
+  opacity: 0;
+}
+[data-reveal="heading"][data-reveal-state="shown"] {
+  animation: editorial-heading 850ms var(--motion-ease) both;
+}
+[data-reveal="eyebrow"][data-reveal-state="shown"] {
+  animation: editorial-eyebrow 600ms var(--motion-ease) both;
+}
+[data-reveal="copy"][data-reveal-state="shown"],
+[data-reveal="marker"][data-reveal-state="shown"] {
+  animation: editorial-opacity 800ms var(--motion-ease) both;
+}
+.pattern-row:nth-child(2) .pattern-marker {
+  animation-delay: 140ms;
+}
+.pattern-row:nth-child(3) .pattern-marker {
+  animation-delay: 280ms;
+}
+.ruled[data-reveal-state] {
+  position: relative;
+  border-top-color: transparent;
+}
+.ruled[data-reveal-state]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-hairline);
+  transform-origin: left;
+}
+.ruled[data-reveal-state="pending"]::before {
+  transform: scaleX(0);
+}
+.ruled[data-reveal-state="shown"]::before {
+  animation: editorial-rule 1000ms var(--motion-ease) both;
+}
+.photograph[data-reveal-state="pending"] img {
+  clip-path: inset(0 0 100% 0);
+}
+.photograph-pause[data-reveal-state="shown"] img {
+  animation: photo-open 1200ms var(--motion-ease) both;
+}
+.photograph-privacy[data-reveal-state="shown"] img {
+  animation: photo-unfold 1000ms var(--motion-ease) both;
+}
+.photograph-hero img {
+  animation: hero-drift 20s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+.photograph-hero[data-photo-active="true"] img {
+  animation-play-state: running;
+}
+.link-arrow {
+  display: inline-block;
+  transition: transform var(--motion-short) var(--motion-ease);
+}
+@media (hover: hover) {
+  .text-link:hover:not(:disabled) .link-arrow,
+  .nav-begin:hover .link-arrow {
+    transform: translateX(2px);
+  }
+  .choice-row:hover:not(:disabled) {
+    background: var(--color-sage-tint);
+    box-shadow: inset 2px 0 var(--color-sage);
+  }
+  .flow-list button:hover:not(:disabled) {
+    background: var(--color-sage-tint);
+  }
+}
+@keyframes editorial-heading {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes editorial-eyebrow {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes editorial-opacity {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes editorial-rule {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes photo-open {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes photo-unfold {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes hero-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
   }
 }
 @media (max-width: 1199px) {
@@ -1258,6 +1608,13 @@ figcaption {
   .companion-greeting,
   .companion-goodbye,
   .companion .limb {
+    transform: none !important;
+  }
+  [data-reveal],
+  [data-reveal]::before,
+  [data-reveal] img {
+    opacity: 1 !important;
+    clip-path: none !important;
     transform: none !important;
   }
 }

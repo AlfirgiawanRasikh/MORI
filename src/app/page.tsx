@@ -6,10 +6,12 @@ import { Grounding } from "@/components/grounding";
 import { ReflectionSection } from "@/components/reflection";
 import { Patterns, Privacy } from "@/components/patterns";
 import { SupportButton } from "@/components/support-dialog";
+import { MotionReveals } from "@/components/motion-reveals";
 
 export default function Home() {
   return (
     <ExperienceProvider>
+      <MotionReveals />
       <Header />
       <main id="main" tabIndex={-1}>
         <section
@@ -59,16 +61,21 @@ export default function Home() {
         <section
           className="page-width section-space ruled"
           id="philosophy"
+          data-reveal="rule"
           aria-labelledby="philosophy-heading"
         >
           <div className="editorial-grid">
             <div className="lg:col-span-8">
-              <Eyebrow>Less thinking</Eyebrow>
-              <h2 className="manifesto-heading" id="philosophy-heading">
+              <Eyebrow reveal>Less thinking</Eyebrow>
+              <h2
+                className="manifesto-heading"
+                id="philosophy-heading"
+                data-reveal="heading"
+              >
                 When your mind already feels full, more options aren’t always
                 helpful.
               </h2>
-              <p className="body-copy manifesto-copy">
+              <p className="body-copy manifesto-copy" data-reveal="copy">
                 MORI asks only what it needs to understand the moment, then
                 offers one small next step. Less thinking. More grounding.
               </p>
@@ -114,7 +121,7 @@ export default function Home() {
               <figcaption>Plate No. 02 / Nothing to do for a moment</figcaption>
             </figure>
             <div className="lg:col-span-4 lg:pl-6">
-              <blockquote>
+              <blockquote data-reveal="heading">
                 You don’t have to
                 <br />
                 explain everything.
@@ -137,10 +144,11 @@ export default function Home() {
         >
           <div className="page-width">
             <div className="max-w-3xl">
-              <Eyebrow>Human support</Eyebrow>
+              <Eyebrow reveal>Human support</Eyebrow>
               <h2
                 id="support-heading"
                 className="section-heading support-heading"
+                data-reveal="heading"
               >
                 Sometimes you need more than an app.
               </h2>
@@ -163,7 +171,7 @@ export default function Home() {
           <div className="final-companion">
             <Companion goodbye />
           </div>
-          <h2 id="final-heading">
+          <h2 id="final-heading" data-reveal="heading">
             You don’t need to figure
             <br className="hidden sm:block" /> everything out today.
           </h2>

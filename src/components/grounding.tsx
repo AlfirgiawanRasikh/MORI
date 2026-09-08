@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { activities } from "@/lib/routing";
+import { groundingPosture } from "@/lib/companion";
+import { useInView } from "@/hooks/use-in-view";
 import { Companion } from "./companion";
 import { Eyebrow } from "./editorial";
 import { focusSection, useExperience } from "./experience-provider";
@@ -9,6 +11,8 @@ export function Grounding() {
   const { state, dispatch } = useExperience();
   const activity = activities[state.activeActivity ?? "grounding"];
   const active = !!state.activeActivity && !state.activityComplete;
+  const { ref: visualRef, visible: visualVisible } =
+    useInView<HTMLDivElement>(0.2);
   const instruction = activity.steps[state.instruction];
   const titleRef = useRef<HTMLHeadingElement>(null);
   const lastInstruction = useRef(state.instruction);
@@ -59,7 +63,14 @@ export function Grounding() {
           </p>
         </div>
         <div className="grounding-card">
-          <div className="grounding-visual" aria-hidden="true">
+          <div
+            className="grounding-visual"
+            ref={visualRef}
+            data-breathing={
+              active && activity.id === "breathing" && visualVisible
+            }
+            aria-hidden="true"
+          >
             <div
               className={`breath-disc ${active && activity.id === "breathing" ? "breathing" : ""}`}
             >
@@ -68,13 +79,11 @@ export function Grounding() {
             <div className="grounding-companion">
               <Companion
                 dark
-                state={
-                  state.activityComplete
-                    ? "settle"
-                    : state.instruction === 1
-                      ? "notice"
-                      : "sit"
-                }
+                state={groundingPosture(
+                  activity.id,
+                  state.instruction,
+                  state.activityComplete,
+                )}
               />
             </div>
           </div>

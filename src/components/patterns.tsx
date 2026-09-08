@@ -68,9 +68,10 @@ export function Patterns() {
     <section
       className="page-width section-space ruled"
       id="patterns"
+      data-reveal="rule"
       aria-labelledby="patterns-heading"
     >
-      <Eyebrow>Patterns</Eyebrow>
+      <Eyebrow reveal>Patterns</Eyebrow>
       <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
         <div>
           <h2 id="patterns-heading" className="section-heading">
@@ -98,7 +99,11 @@ export function Patterns() {
               <h3 className="font-serif text-3xl mb-3">{row.title}</h3>
               <p className="body-copy">{row.text}</p>
             </div>
-            <span className="pattern-marker" aria-hidden="true" />
+            <span
+              className="pattern-marker"
+              aria-hidden="true"
+              data-reveal="marker"
+            />
           </article>
         ))}
       </div>

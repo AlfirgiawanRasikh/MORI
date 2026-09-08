@@ -4,14 +4,27 @@ import Image from "next/image";
 export function Eyebrow({
   children,
   className = "",
+  reveal = false,
 }: {
   children: ReactNode;
   className?: string;
+  reveal?: boolean;
 }) {
-  return <p className={`eyebrow ${className}`}>{children}</p>;
+  return (
+    <p
+      className={`eyebrow ${className}`}
+      data-reveal={reveal ? "eyebrow" : undefined}
+    >
+      {children}
+    </p>
+  );
 }
 export function Arrow() {
-  return <span aria-hidden="true">→</span>;
+  return (
+    <span className="link-arrow" aria-hidden="true">
+      →
+    </span>
+  );
 }
 export function BeginLink({
   children = "Check in with yourself",
@@ -40,7 +53,10 @@ export function Photograph({
   children?: ReactNode;
 }) {
   return (
-    <div className={`photograph photograph-${name} ${className}`}>
+    <div
+      className={`photograph photograph-${name} ${className}`}
+      data-reveal={name === "hero" ? undefined : name}
+    >
       <Image
         src={`/images/${name}.webp`}
         alt={alt}
@@ -50,7 +66,8 @@ export function Photograph({
             ? "(min-width: 1024px) 66vw, 100vw"
             : "(min-width: 1024px) 40vw, 100vw"
         }
-        preload={priority}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
       />
       {children}
     </div>

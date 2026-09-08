@@ -242,8 +242,12 @@ export function OneSmallStep() {
     >
       <div className="editorial-grid items-center">
         <div className="lg:col-span-6">
-          <Eyebrow>One small step</Eyebrow>
-          <h2 id="one-step-heading" className="section-heading">
+          <Eyebrow reveal>One small step</Eyebrow>
+          <h2
+            id="one-step-heading"
+            className="section-heading"
+            data-reveal="heading"
+          >
             One thing.
             <br />
             <em>Not ten.</em>

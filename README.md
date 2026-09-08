@@ -82,9 +82,22 @@ Native dialogs provide browser focus containment and Escape handling.
 Main navigation moves out of view only while an active activity is in view,
 and reappears when it receives keyboard focus.
 
-All nonessential motion is disabled with `prefers-reduced-motion: reduce`.
-Greetings play once. The final wave starts once on entering view. Companion
-motion carries no essential information and does not control recommendations.
+All nonessential motion is disabled with `prefers-reduced-motion: reduce`,
+including when the preference changes during a visit. Hero greeting waits
+for 60% visibility and 650ms of quiet before a 5.2-second walk and wave.
+The final goodbye waits for 65% visibility and 1000ms, and plays only once.
+These flags live in React, never browser storage.
+
+Idle movement has long still intervals, an occasional blink and weight shift,
+and a very small eight-second breath. Deliberate gestures pause idle motion;
+listening and settling stay particularly still. Grounding posture follows the
+current instruction through presentation-only mappings. Companion motion
+carries no essential information and never controls recommendations.
+
+Selective viewport reveals enhance editorial headings, rules, and photographs.
+The hero photo drifts at most 2% over 20 seconds; other photos use one-time
+clipping reveals. Decorative loops pause outside the viewport and in hidden
+tabs. Content remains available without JavaScript and in reduced motion.
 
 ## Checks
 
@@ -92,23 +105,35 @@ motion carries no essential information and does not control recommendations.
 npm run typecheck
 npm run lint
 npm test
+npm run check:punctuation
 npm run build
 npm run format:check
+npx playwright install chromium
+npm run test:e2e
 ```
 
 Tests cover routing combinations, skipped questions, three-decision access,
 answer resets, completion, all reflection branches, history isolation, exit,
 and companion separation. Build and HTTP smoke checks verify compilation
-and initial rendering. The final browser cleanup pass covered 375px, 430px,
-768px, 1024px, and 1440px layouts, keyboard navigation, support-dialog focus,
-and reduced motion. See [QA notes](reference/QA.md) for scope and remaining
-screen-reader, zoom, and real-device checks. No WCAG conformance claim is made.
+and initial rendering. Playwright runs the production static export on a
+loopback-only test server, in both normal and reduced motion. It covers the
+critical product flow, support dialogs, export/clear behavior, real greeting
+transforms, once-only gestures, and six responsive widths. Screenshots and
+failure traces are written to the ignored `artifacts/` directory.
+
+If a browser download is unavailable locally, `PLAYWRIGHT_CHANNEL=chrome`
+selects an installed Chrome browser; CI uses Playwright's pinned Chromium.
+The punctuation check scans repository-owned text. Use
+`node scripts/check-punctuation.mjs --build` to also scan the static export.
+See [QA notes](reference/QA.md) for scope and remaining device checks.
+No WCAG conformance claim is made.
 
 ## Preview and portfolio release
 
 GitHub Actions validates pushes and pull requests using Node.js 24, which
 is supported by this project's Node.js 22-or-newer requirement. CI installs
-from the lockfile and runs type checking, lint, tests, build, and formatting.
+from the lockfile and runs type checking, lint, unit tests, punctuation checks,
+build, formatting, and Playwright in both motion modes.
 
 This remains a development preview. Keep `robots.index` and `robots.follow`
 disabled in `src/app/layout.tsx` for now.

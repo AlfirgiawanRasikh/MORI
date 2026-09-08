@@ -93,10 +93,30 @@ npm run typecheck
 npm run lint
 npm test
 npm run build
+npm run format:check
 ```
 
 Tests cover routing combinations, skipped questions, three-decision access,
 answer resets, completion, all reflection branches, history isolation, exit,
 and companion separation. Build and HTTP smoke checks verify compilation
-and initial rendering. Interactive browser, screen-reader, zoom and device
-testing remain manual acceptance steps; no WCAG conformance claim is made.
+and initial rendering. The final browser cleanup pass covered 375px, 430px,
+768px, 1024px, and 1440px layouts, keyboard navigation, support-dialog focus,
+and reduced motion. See [QA notes](reference/QA.md) for scope and remaining
+screen-reader, zoom, and real-device checks. No WCAG conformance claim is made.
+
+## Preview and portfolio release
+
+GitHub Actions validates pushes and pull requests using Node.js 24, which
+is supported by this project's Node.js 22-or-newer requirement. CI installs
+from the lockfile and runs type checking, lint, tests, build, and formatting.
+
+This remains a development preview. Keep `robots.index` and `robots.follow`
+disabled in `src/app/layout.tsx` for now.
+
+TODO before the final public portfolio release:
+
+- Complete the remaining real-device and assistive-technology checks.
+- Merge the final reviewed implementation into a stable `main` branch.
+  Preserve the existing `codex/mori-landing` branch during preparation.
+- Explicitly enable both robots indexing and following for the public release.
+  Do not enable them automatically for previews.

@@ -99,6 +99,7 @@ export function Grounding() {
               : "Around two minutes · Take as long as you need"}
           </p>
           <button
+            type="button"
             className="button w-full"
             onClick={() => {
               if (state.activityComplete) {
@@ -124,6 +125,7 @@ export function Grounding() {
           </button>
           {active ? (
             <button
+              type="button"
               className="text-button grounding-exit"
               onClick={() => {
                 dispatch({ type: "exit" });

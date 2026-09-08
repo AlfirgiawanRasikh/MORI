@@ -28,7 +28,7 @@ const jakarta = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "MORI — A quieter place to begin",
+  title: "MORI | A quieter place to begin",
   description:
     "A quieter way to understand how you feel and find one small thing to do next. An independent mental wellness concept.",
   applicationName: "MORI",

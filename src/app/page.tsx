@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <ExperienceProvider>
       <Header />
-      <main id="main">
+      <main id="main" tabIndex={-1}>
         <section
           className="page-width hero-section"
           aria-labelledby="hero-heading"

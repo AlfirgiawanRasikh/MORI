@@ -173,6 +173,7 @@ export function CheckIn() {
                     Try this: {recommendation.name.toLowerCase()}.
                   </p>
                   <button
+                    type="button"
                     className="button w-full"
                     onClick={() => {
                       dispatch({ type: "start", activity: recommendation.id });
@@ -182,6 +183,7 @@ export function CheckIn() {
                     {recommendation.action} <Arrow />
                   </button>
                   <button
+                    type="button"
                     className="text-button mt-3 w-full"
                     onClick={() => dispatch({ type: "alternative" })}
                   >
@@ -192,6 +194,7 @@ export function CheckIn() {
             </div>
             <div className="product-bottom">
               <button
+                type="button"
                 className="text-button"
                 disabled={stage === 0}
                 onClick={() =>
@@ -207,6 +210,7 @@ export function CheckIn() {
               </span>
               {stage === 1 || stage === 2 ? (
                 <button
+                  type="button"
                   className="text-button accent"
                   onClick={() =>
                     dispatch({
@@ -261,6 +265,7 @@ export function OneSmallStep() {
           </p>
           {ready ? (
             <button
+              type="button"
               className="text-link mt-6"
               onClick={() => {
                 dispatch({ type: "start", activity: activity.id });

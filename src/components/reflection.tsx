@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 import { useExperience, focusSection } from "./experience-provider";
 import { reflectionPosture } from "@/lib/companion";
 import { alternativeTo, type Reflection } from "@/lib/routing";
@@ -13,6 +14,10 @@ const responses: { value: Reflection; label: string }[] = [
 ];
 export function ReflectionSection() {
   const { state, dispatch } = useExperience();
+  const finishedHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (state.finished) finishedHeading.current?.focus({ preventScroll: true });
+  }, [state.finished]);
   return (
     <section
       className="page-width section-space"
@@ -37,12 +42,19 @@ export function ReflectionSection() {
           </p>
           {state.finished ? (
             <div className="reflection-response" role="status">
-              <h3 className="font-serif text-3xl">You can leave it here.</h3>
+              <h3
+                ref={finishedHeading}
+                tabIndex={-1}
+                className="font-serif text-3xl"
+              >
+                You can leave it here.
+              </h3>
               <p className="body-copy mt-3">
                 You don’t have to do anything else. Carry on with your day
                 whenever you’re ready.
               </p>
               <button
+                type="button"
                 className="text-button mt-5"
                 onClick={() => {
                   dispatch({ type: "restart" });
@@ -57,6 +69,7 @@ export function ReflectionSection() {
               <div className="choice-list" aria-label="How does it feel now?">
                 {responses.map(({ value, label }) => (
                   <button
+                    type="button"
                     key={value}
                     className="choice-row"
                     aria-pressed={state.reflection === value}
@@ -100,6 +113,7 @@ export function ReflectionSection() {
                         <SupportButton kind="trusted" />
                         <SupportButton />
                         <button
+                          type="button"
                           className="text-button"
                           onClick={() => dispatch({ type: "finish" })}
                         >
@@ -110,6 +124,7 @@ export function ReflectionSection() {
                       <div className="flex flex-wrap items-center gap-4 mt-6">
                         {state.reflection === "same" && (
                           <button
+                            type="button"
                             className="button"
                             onClick={() => {
                               const next = alternativeTo(
@@ -124,6 +139,7 @@ export function ReflectionSection() {
                           </button>
                         )}
                         <button
+                          type="button"
                           className={
                             state.reflection === "lighter"
                               ? "button"

@@ -98,9 +98,7 @@ export function Patterns() {
               <h3 className="font-serif text-3xl mb-3">{row.title}</h3>
               <p className="body-copy">{row.text}</p>
             </div>
-            <span className="pattern-marker" aria-hidden="true">
-              —
-            </span>
+            <span className="pattern-marker" aria-hidden="true" />
           </article>
         ))}
       </div>
@@ -112,7 +110,7 @@ export function Privacy() {
   const [notice, setNotice] = useState("");
   function exportHistory() {
     const text = [
-      "MORI — Your check-ins from this visit",
+      "MORI | Your check-ins from this visit",
       "",
       ...state.history.map(
         (entry, i) =>
@@ -174,6 +172,7 @@ export function Privacy() {
           </dl>
           <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
             <button
+              type="button"
               className="text-link"
               disabled={!state.history.length}
               onClick={exportHistory}
@@ -181,6 +180,7 @@ export function Privacy() {
               Export this visit ↓
             </button>
             <button
+              type="button"
               className="text-link"
               onClick={() => {
                 dispatch({ type: "clear" });

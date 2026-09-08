@@ -41,6 +41,22 @@ export function SupportButton({
         }
         onCancel={() => setOpen(false)}
         onClose={() => setOpen(false)}
+        onKeyDown={(event) => {
+          if (event.key !== "Tab") return;
+          const controls =
+            event.currentTarget.querySelectorAll<HTMLButtonElement>(
+              "button:not(:disabled)",
+            );
+          const first = controls[0];
+          const last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last?.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first?.focus();
+          }
+        }}
         onClick={(event) => {
           if (event.target === event.currentTarget) {
             const box = event.currentTarget.getBoundingClientRect();
@@ -59,6 +75,7 @@ export function SupportButton({
             {kind === "trusted" ? "Human connection" : "Care and support"}
           </Eyebrow>
           <button
+            type="button"
             className="icon-button"
             autoFocus
             aria-label="Close support panel"
@@ -107,7 +124,11 @@ export function SupportButton({
             </div>
           </>
         )}
-        <button className="button mt-8" onClick={() => setOpen(false)}>
+        <button
+          type="button"
+          className="button mt-8"
+          onClick={() => setOpen(false)}
+        >
           Close and return
         </button>
       </dialog>

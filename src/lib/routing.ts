@@ -235,7 +235,7 @@ export const activities: Record<ActivityId, Activity> = {
       ),
       step(
         "Soften one small area.",
-        "Your hands, jaw, or shoulders — only if it feels comfortable.",
+        "Your hands, jaw, or shoulders, only if it feels comfortable.",
       ),
       step(
         "Let one breath pass.",
@@ -261,7 +261,7 @@ export const activities: Record<ActivityId, Activity> = {
       ),
       step(
         "What might you need in the next few minutes?",
-        "A little quiet, a pause, some company — or perhaps you're not sure.",
+        "A little quiet, a pause, some company, or perhaps you're not sure.",
       ),
       step(
         "Let one small need matter.",
@@ -284,7 +284,7 @@ export const activities: Record<ActivityId, Activity> = {
       ),
       step(
         "Give it a little attention.",
-        "A person, a feeling, the light in the room — let it be simple.",
+        "A person, a feeling, the light in the room. Let it be simple.",
       ),
       step("Let yourself enjoy it.", "There's nothing to record or achieve."),
       step(

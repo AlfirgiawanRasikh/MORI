@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 
 for (const width of [375, 390, 430, 768, 1024, 1440]) {
   test(`editorial visual smoke at ${width}px`, async ({ page }, info) => {
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
     await page.setViewportSize({ width, height: width < 640 ? 900 : 1000 });
     await page.goto("/");
     await page.evaluate(() => document.fonts.ready);
@@ -50,5 +52,6 @@ for (const width of [375, 390, 430, 768, 1024, 1440]) {
     if (info.project.name === "normal-motion")
       await page.screenshot({ path: info.outputPath("support-dialog.png") });
     await page.keyboard.press("Escape");
+    expect(errors).toEqual([]);
   });
 }

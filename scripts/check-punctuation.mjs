@@ -11,7 +11,7 @@ const excluded = new Set([
   "test-results",
   "playwright-report",
 ]);
-const textFile = /\.(?:[cm]?[jt]sx?|json|css|html|svg|md|txt|ya?ml)$/i;
+const textFile = /\.(?:[cm]?[jt]sx?|json|css|html|svg|md|txt|py|ya?ml)$/i;
 let files = 0;
 let em = 0;
 let en = 0;

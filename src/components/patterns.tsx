@@ -1,11 +1,43 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useInView } from "@/hooks/use-in-view";
+import { gsap, useGSAP, motion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { MoriTrace } from "./mori-trace";
 import { activities } from "@/lib/routing";
 import { useExperience } from "./experience-provider";
 import { Eyebrow, Photograph } from "./editorial";
 
 export function Patterns() {
-  const { state } = useExperience();
+  const { state, clearRevision } = useExperience();
+  const { ref: section, visible } = useInView<HTMLElement>(0.1);
+  const animation = useRef<gsap.core.Tween | null>(null);
+  const reduced = usePrefersReducedMotion();
+  const cleared = clearRevision > 0 && state.history.length === 0;
+  useGSAP(
+    () => {
+      if (reduced) return;
+      animation.current = gsap.fromTo(
+        ".pattern-row, .pattern-empty",
+        { opacity: 0, x: 5 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: motion.clear,
+          stagger: 0.1,
+          paused: !visible,
+        },
+      );
+    },
+    {
+      scope: section,
+      dependencies: [clearRevision, reduced, state.history.length],
+      revertOnUpdate: true,
+    },
+  );
+  useEffect(() => {
+    animation.current?.paused(!visible);
+  }, [visible]);
   const complete = state.history;
   const enough = complete.length >= 3;
   const workCount = complete.filter(
@@ -67,11 +99,14 @@ export function Patterns() {
   return (
     <section
       className="page-width section-space ruled"
+      ref={section}
+      data-cleared={cleared}
       id="patterns"
       data-reveal="rule"
       aria-labelledby="patterns-heading"
     >
-      <Eyebrow reveal>Patterns</Eyebrow>
+      <p className="pattern-margin">Over time / Patterns</p>
+      <MoriTrace kind="time" empty={cleared} />
       <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
         <div>
           <h2 id="patterns-heading" className="section-heading">
@@ -88,25 +123,53 @@ export function Patterns() {
             : "Illustrative examples, not your history. Your own notes appear after three completed check-ins this visit."}
         </p>
       </div>
-      <div className="pattern-list">
-        {rows.map((row) => (
-          <article className="pattern-row" key={row.label}>
-            <div>
-              <Eyebrow>{row.label}</Eyebrow>
-              <p className="small-copy muted">{row.note}</p>
-            </div>
-            <div>
-              <h3 className="font-serif text-3xl mb-3">{row.title}</h3>
-              <p className="body-copy">{row.text}</p>
-            </div>
-            <span
-              className="pattern-marker"
-              aria-hidden="true"
-              data-reveal="marker"
-            />
-          </article>
-        ))}
-      </div>
+      {cleared ? (
+        <div className="pattern-empty" role="status">
+          <p className="font-serif text-3xl">A little space, again.</p>
+          <p className="body-copy mt-4">
+            Your observations are cleared. Nothing from this visit is kept.
+          </p>
+        </div>
+      ) : (
+        <div className="pattern-list">
+          {rows.map((row, index) => (
+            <article className={`pattern-row pattern-${index}`} key={row.label}>
+              <svg
+                className="observation-mark"
+                viewBox="0 0 140 60"
+                fill="none"
+                aria-hidden="true"
+              >
+                {index === 0 ? (
+                  <>
+                    <path d="M8 34Q45 32 128 34" />
+                    <circle cx="24" cy="34" r="2" />
+                    <circle cx="53" cy="33" r="2" />
+                    <circle cx="112" cy="34" r="2" />
+                  </>
+                ) : index === 1 ? (
+                  <>
+                    <path d="M18 42Q32 38 47 40M57 31Q71 29 86 31M98 23L124 22" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M9 33C41 30 37 19 64 24S94 38 129 31" />
+                    <circle cx="129" cy="31" r="2" />
+                  </>
+                )}
+              </svg>
+              <div>
+                <Eyebrow>{row.label}</Eyebrow>
+                <p className="small-copy muted">{row.note}</p>
+              </div>
+              <div>
+                <h3 className="font-serif text-3xl mb-3">{row.title}</h3>
+                <p className="body-copy">{row.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -146,10 +209,10 @@ export function Privacy() {
             name="privacy"
             alt="A closed linen notebook, folded handmade paper and a smooth river pebble on a wooden desk."
           />
-          <figcaption>Plate No. 03 / A little room of your own</figcaption>
+          <figcaption>A little room of your own / Yours to keep</figcaption>
         </figure>
         <div className="lg:col-span-7 lg:pl-8">
-          <Eyebrow>Privacy</Eyebrow>
+          <p className="privacy-caption">A note on privacy</p>
           <h2 id="privacy-heading" className="section-heading">
             Your feelings are yours.
           </h2>

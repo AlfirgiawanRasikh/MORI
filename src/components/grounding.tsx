@@ -4,7 +4,9 @@ import { activities } from "@/lib/routing";
 import { groundingPosture } from "@/lib/companion";
 import { useInView } from "@/hooks/use-in-view";
 import { Companion } from "./companion";
-import { Eyebrow } from "./editorial";
+import { MoriTrace } from "./mori-trace";
+import { gsap, useGSAP, motion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { focusSection, useExperience } from "./experience-provider";
 
 export function Grounding() {
@@ -17,6 +19,47 @@ export function Grounding() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const lastInstruction = useRef(state.instruction);
   const sectionRef = useRef<HTMLElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const breathing = useRef<gsap.core.Timeline | null>(null);
+  useGSAP(
+    () => {
+      if (reduced || !active || activity.id !== "breathing") return;
+      const tl = gsap.timeline({
+        paused: true,
+        repeat: -1,
+        yoyo: true,
+        defaults: { duration: motion.breath, ease: "sine.inOut" },
+      });
+      tl.to(".breath-disc", { scale: 1.075, rotation: -5.8 }, 0)
+        .to(".paper-light", { opacity: 0.7, scale: 1.04 }, 0)
+        .to(".companion-breath", { scaleY: 1.015, y: -0.4 }, 0)
+        .to(".trace-ground", { scaleX: 1.025, opacity: 0.6 }, 0);
+      breathing.current = tl;
+      if (visualVisible) tl.play();
+      return () => {
+        breathing.current = null;
+      };
+    },
+    {
+      scope: sectionRef,
+      dependencies: [active, activity.id, reduced],
+      revertOnUpdate: true,
+    },
+  );
+  useEffect(() => {
+    breathing.current?.paused(!visualVisible);
+  }, [visualVisible]);
+  useGSAP(
+    () => {
+      if (reduced) return;
+      gsap.from(".grounding-instruction", { opacity: 0, duration: 0.65 });
+    },
+    {
+      scope: sectionRef,
+      dependencies: [state.instruction, state.activityComplete, reduced],
+      revertOnUpdate: true,
+    },
+  );
   useEffect(() => {
     if (lastInstruction.current !== state.instruction)
       titleRef.current?.focus({ preventScroll: true });
@@ -41,13 +84,11 @@ export function Grounding() {
       ref={sectionRef}
       id="guided-grounding"
       className="grounding-section"
+      data-active={active}
       aria-labelledby="grounding-heading"
     >
       <div className="page-width relative">
-        <div className="grounding-intro">
-          <Eyebrow>
-            {state.activeActivity ? "Your small step" : "Grounding"}
-          </Eyebrow>
+        <div className={`grounding-intro ${active ? "sr-only" : ""}`}>
           <h2
             id="grounding-heading"
             tabIndex={-1}
@@ -62,7 +103,7 @@ export function Grounding() {
             Take a quiet moment. No countdown. No need to get it right.
           </p>
         </div>
-        <div className="grounding-card">
+        <div className="grounding-space">
           <div
             className="grounding-visual"
             ref={visualRef}
@@ -74,7 +115,7 @@ export function Grounding() {
             <div
               className={`breath-disc ${active && activity.id === "breathing" ? "breathing" : ""}`}
             >
-              <span>{activity.id === "breathing" ? "Breathe" : "Be here"}</span>
+              <span className="paper-light" />
             </div>
             <div className="grounding-companion">
               <Companion
@@ -102,6 +143,7 @@ export function Grounding() {
                 : instruction.description}
             </p>
           </div>
+          <MoriTrace kind="ground" />
           <p className="grounding-step">
             {active
               ? `${state.instruction + 1} of ${activity.steps.length} · At your pace`
@@ -109,7 +151,7 @@ export function Grounding() {
           </p>
           <button
             type="button"
-            className="button w-full"
+            className="grounding-continue"
             onClick={() => {
               if (state.activityComplete) {
                 focusSection("reflection");

@@ -26,7 +26,7 @@ export function ReflectionSection() {
     >
       <div className="editorial-grid items-start">
         <div className="lg:col-span-6 lg:pr-8">
-          <Eyebrow>Reflection</Eyebrow>
+          <Eyebrow>06 / Reflect</Eyebrow>
           <h2
             id="reflection-heading"
             tabIndex={-1}

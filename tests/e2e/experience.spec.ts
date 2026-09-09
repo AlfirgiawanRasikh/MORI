@@ -175,3 +175,58 @@ test("keyboard skip link, explicit buttons, local assets, and preview robots", a
       .count(),
   ).toBe(0);
 });
+
+test("clear immediately empties the visit and cancels a departing answer", async ({
+  page,
+}) => {
+  const frame = page.locator(".product-frame");
+  await frame
+    .getByRole("button", { name: "Overwhelmed", exact: false })
+    .evaluate((el: HTMLButtonElement) => el.click());
+  await page
+    .getByRole("button", { name: "Clear this visit" })
+    .evaluate((el: HTMLButtonElement) => el.click());
+  await expect(frame).toHaveAttribute("data-density", "0");
+  await expect(
+    frame.getByRole("button", { name: "Overwhelmed", exact: false }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator('#privacy [role="status"]')).toContainText(
+    "cleared",
+  );
+  await expect(page.locator("#patterns")).toHaveAttribute(
+    "data-cleared",
+    "true",
+  );
+  await page.waitForTimeout(800);
+  await expect(frame).toHaveAttribute("data-density", "0");
+  await expect(page.locator(".trace-decisions")).toHaveAttribute(
+    "data-empty",
+    "true",
+  );
+});
+
+test("hero preload matches its responsive source without a duplicate image request", async ({
+  page,
+}) => {
+  const source = page.locator(".photograph-hero source");
+  const preload = page.locator('link[rel="preload"][as="image"]');
+  await expect(preload).toHaveCount(1);
+  expect(await preload.getAttribute("imagesrcset")).toBe(
+    await source.getAttribute("srcset"),
+  );
+  expect(await preload.getAttribute("imagesizes")).toBe(
+    await source.getAttribute("sizes"),
+  );
+  const heroRequests = await page.evaluate(() =>
+    performance
+      .getEntriesByType("resource")
+      .filter((entry) => entry.name.includes("/images/hero")),
+  );
+  expect(heroRequests).toHaveLength(1);
+  const footerTargets = await page
+    .locator(".footer-nav a")
+    .evaluateAll((elements) =>
+      elements.map((el) => el.getBoundingClientRect().height),
+    );
+  expect(Math.min(...footerTargets)).toBeGreaterThanOrEqual(44);
+});

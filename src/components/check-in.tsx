@@ -8,11 +8,16 @@ import {
   moodDescriptions,
   routeCheckIn,
 } from "@/lib/routing";
+import { gsap, useGSAP, motion } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { MoriTrace } from "./mori-trace";
+import { useGroundingHandoff } from "./grounding-handoff";
+import type { ExperienceAction } from "@/lib/experience";
 import type { Stage } from "@/lib/experience";
 import { moodPosture } from "@/lib/companion";
 import { Companion } from "./companion";
 import { Arrow, Eyebrow } from "./editorial";
-import { focusSection, useExperience } from "./experience-provider";
+import { useExperience } from "./experience-provider";
 
 const labels = [
   "How you feel",
@@ -26,8 +31,71 @@ const headings = [
   "Where is your mind stuck?",
 ];
 export function CheckIn() {
-  const { state, dispatch } = useExperience();
+  const { state, dispatch, clearRevision } = useExperience();
+  const startGrounding = useGroundingHandoff();
   const { stage, input } = state;
+  const section = useRef<HTMLElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const changing = useRef(false);
+  const departure = useRef<gsap.core.Timeline | null>(null);
+  const { contextSafe } = useGSAP({ scope: section });
+  const choose = (action: ExperienceAction) =>
+    contextSafe(() => {
+      if (changing.current) return;
+      if (reduced) {
+        dispatch(action);
+        return;
+      }
+      changing.current = true;
+      departure.current = gsap
+        .timeline({
+          onComplete: () => {
+            changing.current = false;
+            dispatch(action);
+          },
+        })
+        .to(".choice-row", {
+          opacity: 0,
+          x: -3,
+          duration: 0.18,
+          stagger: { each: 0.015, from: "end" },
+          ease: motion.ease,
+        })
+        .to(".product-content", { opacity: 0, duration: 0.1 }, "<0.06");
+    })();
+  useGSAP(
+    () => {
+      departure.current?.kill();
+      changing.current = false;
+      if (reduced) return;
+      gsap.fromTo(
+        ".product-content",
+        { opacity: 0, y: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          ease: motion.opening,
+          clearProps: "all",
+        },
+      );
+      if (section.current?.querySelector(".choice-row"))
+        gsap.from(".choice-row", {
+          opacity: 0,
+          duration: 0.45,
+          stagger: 0.035,
+          clearProps: "opacity,transform",
+        });
+      return () => {
+        departure.current?.kill();
+      };
+    },
+    {
+      scope: section,
+      dependencies: [stage, clearRevision, reduced],
+      revertOnUpdate: true,
+    },
+  );
   const heading = useRef<HTMLHeadingElement>(null);
   const previousStage = useRef(stage);
   useEffect(() => {
@@ -46,13 +114,16 @@ export function CheckIn() {
     stage === 0 ? input.mood : stage === 1 ? input.detail : input.context;
   return (
     <section
+      ref={section}
+      data-stage={stage}
       id="the-practice"
       className="page-width section-space check-in-section"
       aria-labelledby="check-in-heading"
     >
       <div className="editorial-grid items-start">
-        <div className="lg:col-span-5 lg:sticky lg:top-28">
-          <Eyebrow>Check in</Eyebrow>
+        <div className="lg:col-span-5 check-in-editorial">
+          <Eyebrow>02 / Notice</Eyebrow>
+          <MoriTrace stage={stage} empty={clearRevision > 0 && !input.mood} />
           <h2
             id="check-in-heading"
             className="section-heading"
@@ -64,13 +135,13 @@ export function CheckIn() {
           <p className="body-copy mt-6">
             You never have to explain everything to use MORI.
           </p>
-          <p className="body-copy muted mt-4 max-w-md">
+          <p className="body-copy muted mt-4 max-w-md check-in-context">
             Start with what feels closest. Share only what feels comfortable,
             and find one manageable next step.
           </p>
           <ol className="flow-list" aria-label="Check-in steps">
             {labels.map((label, index) => (
-              <li key={label}>
+              <li key={label} hidden={stage > 0 && index !== stage}>
                 <button
                   type="button"
                   aria-current={stage === index ? "step" : undefined}
@@ -94,14 +165,14 @@ export function CheckIn() {
               </li>
             ))}
           </ol>
-          <p className="small-copy muted border-t border-hairline pt-6">
+          <p className="small-copy muted border-t border-hairline pt-6 check-in-context">
             No account. No long explanations.
             <br />
             You can skip either of the next questions.
           </p>
         </div>
         <div className="lg:col-span-7 flex justify-center lg:justify-end pt-8 lg:pt-0">
-          <div className="product-frame">
+          <div className="product-frame" data-density={stage}>
             {stage < 3 && (
               <div className="product-companion">
                 <Companion state={moodPosture(input.mood)} />
@@ -133,14 +204,14 @@ export function CheckIn() {
                         aria-pressed={selected === option}
                         onClick={() => {
                           if (stage === 0)
-                            dispatch({
+                            choose({
                               type: "mood",
                               value: option as (typeof moods)[number],
                             });
                           else if (stage === 1)
-                            dispatch({ type: "detail", value: option });
+                            choose({ type: "detail", value: option });
                           else
-                            dispatch({
+                            choose({
                               type: "context",
                               value:
                                 option === "Rather not say" ? null : option,
@@ -175,10 +246,9 @@ export function CheckIn() {
                   <button
                     type="button"
                     className="button w-full"
-                    onClick={() => {
-                      dispatch({ type: "start", activity: recommendation.id });
-                      focusSection("guided-grounding");
-                    }}
+                    onClick={(event) =>
+                      startGrounding(recommendation.id, event.currentTarget)
+                    }
                   >
                     {recommendation.action} <Arrow />
                   </button>
@@ -232,7 +302,8 @@ export function CheckIn() {
   );
 }
 export function OneSmallStep() {
-  const { state, dispatch } = useExperience();
+  const { state } = useExperience();
+  const startGrounding = useGroundingHandoff();
   const ready = state.stage === 3;
   const activity = activities[state.alternative ?? routeCheckIn(state.input)];
   return (
@@ -242,7 +313,7 @@ export function OneSmallStep() {
     >
       <div className="editorial-grid items-center">
         <div className="lg:col-span-6">
-          <Eyebrow reveal>One small step</Eyebrow>
+          <Eyebrow reveal>04 / One small step</Eyebrow>
           <h2
             id="one-step-heading"
             className="section-heading"
@@ -271,10 +342,9 @@ export function OneSmallStep() {
             <button
               type="button"
               className="text-link mt-6"
-              onClick={() => {
-                dispatch({ type: "start", activity: activity.id });
-                focusSection("guided-grounding");
-              }}
+              onClick={(event) =>
+                startGrounding(activity.id, event.currentTarget)
+              }
             >
               {activity.action} <Arrow />
             </button>

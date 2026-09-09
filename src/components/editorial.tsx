@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
+import { Wordmark } from "./wordmark";
 
 export function Eyebrow({
   children,
@@ -57,18 +58,36 @@ export function Photograph({
       className={`photograph photograph-${name} ${className}`}
       data-reveal={name === "hero" ? undefined : name}
     >
-      <Image
-        src={`/images/${name}.webp`}
-        alt={alt}
-        fill
-        sizes={
-          name === "pause"
-            ? "(min-width: 1024px) 66vw, 100vw"
-            : "(min-width: 1024px) 40vw, 100vw"
-        }
-        loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : undefined}
-      />
+      <picture>
+        <source
+          type="image/webp"
+          srcSet={(name === "hero"
+            ? [400, 640, 848]
+            : name === "pause"
+              ? [400, 640, 960, 1280, 1376]
+              : [400, 640, 960, 1200]
+          )
+            .map(
+              (width, index, widths) =>
+                `/images/${name}${index === widths.length - 1 ? "" : `-${width}`}.webp ${width}w`,
+            )
+            .join(", ")}
+          sizes={
+            name === "hero"
+              ? "(min-width: 1320px) 470px, (min-width: 640px) 40vw, calc(100vw - 68px)"
+              : name === "pause"
+                ? "(min-width: 1320px) 750px, (min-width: 640px) 60vw, calc(100vw - 48px)"
+                : "(min-width: 1320px) 470px, (min-width: 640px) 40vw, calc(100vw - 48px)"
+          }
+        />
+        <Image
+          src={`/images/${name}.webp`}
+          alt={alt}
+          fill
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : undefined}
+        />
+      </picture>
       {children}
     </div>
   );
@@ -78,7 +97,7 @@ export function Header() {
     <header className="site-header">
       <div className="page-width flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-4 lg:py-0">
         <a className="wordmark" href="#main" aria-label="MORI home">
-          MORI
+          <Wordmark />
         </a>
         <span className="header-tagline">
           A quiet mental wellness companion

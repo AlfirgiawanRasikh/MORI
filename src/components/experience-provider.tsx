@@ -3,6 +3,8 @@ import {
   createContext,
   useContext,
   useReducer,
+  useState,
+  useCallback,
   type Dispatch,
   type ReactNode,
 } from "react";
@@ -14,12 +16,18 @@ import {
 } from "@/lib/experience";
 const ExperienceContext = createContext<{
   state: ExperienceState;
+  clearRevision: number;
   dispatch: Dispatch<ExperienceAction>;
 } | null>(null);
 export function ExperienceProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(experienceReducer, initialState);
+  const [state, send] = useReducer(experienceReducer, initialState);
+  const [clearRevision, setClearRevision] = useState(0);
+  const dispatch = useCallback((action: ExperienceAction) => {
+    send(action);
+    if (action.type === "clear") setClearRevision((value) => value + 1);
+  }, []);
   return (
-    <ExperienceContext.Provider value={{ state, dispatch }}>
+    <ExperienceContext.Provider value={{ state, dispatch, clearRevision }}>
       {children}
     </ExperienceContext.Provider>
   );

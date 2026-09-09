@@ -82,22 +82,36 @@ Native dialogs provide browser focus containment and Escape handling.
 Main navigation moves out of view only while an active activity is in view,
 and reappears when it receives keyboard focus.
 
-All nonessential motion is disabled with `prefers-reduced-motion: reduce`,
-including when the preference changes during a visit. Hero greeting waits
-for 60% visibility and 650ms of quiet before a 5.2-second walk and wave.
-The final goodbye waits for 65% visibility and 1000ms, and plays only once.
-These flags live in React, never browser storage.
+GSAP and `@gsap/react` orchestrate the companion, density collapse, surface
+handoff, MORI Trace and selective editorial reveals. `ScrollTrigger` observes
+native scrolling. There is no scroll smoothing, pinning, Framer Motion or
+scroll hijacking. Timelines use scoped `useGSAP` cleanup, and decorative
+motion pauses outside the viewport and in hidden tabs.
 
-Idle movement has long still intervals, an occasional blink and weight shift,
-and a very small eight-second breath. Deliberate gestures pause idle motion;
-listening and settling stay particularly still. Grounding posture follows the
-current instruction through presentation-only mappings. Companion motion
-carries no essential information and never controls recommendations.
+The hero is already standing on the rug. After 60% visibility and 900ms of
+stillness it notices, blinks, waves twice and settles. Feet stay planted.
+An authored 60-second ambient sequence follows: long rests, observation,
+a 26px wander, sitting, standing, a shallow arc and a return home. Walking
+articulates alternate feet; greeting and goodbye never walk. The goodbye
+plays once, then remains still. Product-state reactions interrupt the hero
+and settle its locomotion before further ambient behavior. The check-in,
+grounding and reflection companions never wander.
 
-Selective viewport reveals enhance editorial headings, rules, and photographs.
-The hero photo drifts at most 2% over 20 seconds; other photos use one-time
-clipping reveals. Decorative loops pause outside the viewport and in hidden
-tabs. Content remains available without JavaScript and in reduced motion.
+The check-in sheds context, rules and framing as it progresses. Its surface
+expands into a viewport veil, turns warm dark, then reveals grounding beneath
+it. This avoids fragile reparenting or Flip across distant responsive layouts.
+Resize and motion-preference changes resolve to the stable destination with
+keyboard focus. The dark environment has one instruction, a paper-like light,
+a quiet companion and a continuation control. Material and companion breathing
+share one timeline. Reduced motion skips all decorative choreography.
+
+Clearing a visit clears actual state immediately, cancels a pending answer,
+resets the Trace and reveals an empty Patterns state over 650ms. No previous
+history is retained for animation. All motion remains presentation only.
+
+The open O wordmark and favicon share an imperfect opening. The Trace links
+decisions, becomes a quiet temporal line and resolves at the final exhale.
+Patterns remain clearly labeled examples until enough real session data exists.
 
 ## Checks
 
@@ -136,7 +150,7 @@ from the lockfile and runs type checking, lint, unit tests, punctuation checks,
 build, formatting, and Playwright in both motion modes.
 
 This remains a development preview. Keep `robots.index` and `robots.follow`
-disabled in `src/app/layout.tsx` for now.
+disabled in `src/lib/metadata.ts` for now.
 
 TODO before the final public portfolio release:
 
@@ -145,3 +159,33 @@ TODO before the final public portfolio release:
   Preserve the existing `codex/mori-landing` branch during preparation.
 - Explicitly enable both robots indexing and following for the public release.
   Do not enable them automatically for previews.
+
+## Assets and release configuration
+
+The three reference photographs remain local. Native `picture` sources select
+checked-in WebP sizes for the static export; the hero is eager with high fetch
+priority and never starts hidden. Other photographs stay lazy. No image service
+or production cache behavior is assumed.
+
+Web font derivatives retain Newsreader optical-size variation and the current
+weight ranges, with the glyphs used by this English experience. The original
+licensed WOFF2 files remain in `src/assets/fonts`. `scripts/prepare-fonts.py`
+recreates derivatives with Python, fonttools and brotli; this is optional asset
+preparation, not a build dependency. Regenerate or extend coverage before adding
+other languages. Both unused fontsource packages have been removed.
+
+`MORI_PRODUCTION_URL` must be a verified HTTPS origin. Until supplied, no
+canonical URL, metadataBase or URL-dependent social metadata is emitted.
+`MORI_SOCIAL_IMAGE` accepts the path or URL of an approved 1200 x 630 image.
+Neither setting enables indexing. The final social image and public URL remain
+release inputs; no domain or project imagery has been invented.
+
+`src/lib/portfolio.ts` defines the handoff after MORI's footer. It renders
+nothing until real data exists. Supply title, category, year, description,
+image, meaningful imageAlt and destination href for one next project, plus
+an optional allWorkHref. The handoff is a large editorial visual, not a grid.
+Do not add portfolio content inside the product narrative.
+
+Before public release, add the real demo URL and an approved visual preview to
+this README. Repository homepage, topics and branch settings require a separate
+reviewed release step; they are not changed automatically.
